@@ -5,6 +5,7 @@ struct Cpu {
     uint8_t counter;
     uint8_t registers[4];
     uint8_t signal;
+    void (*ops[16])(uint16_t*, struct Cpu*);
 };
 
 enum Op {
@@ -18,5 +19,5 @@ enum Op {
 };
 
 struct Cpu cpu_new(void);
-void cpu_execute(uint16_t memory[16], struct Cpu* cpu);
+uint16_t encode_instruction(enum Op op, uint8_t reg0, uint8_t reg1, uint8_t address);
 void cpu_run(uint16_t memory[16], uint8_t start, struct Cpu* cpu);

@@ -16,10 +16,6 @@ const uint8_t SIGNAL_HALT = 0x00;
 const uint8_t SIGNAL_RUN = 0x01;
 const uint8_t SIGNAL_OUT_OF_MEMORY = 0x02;
 
-struct Cpu cpu_new(void) {
-    return (struct Cpu){0x0000, 0x0, {0x0}, 0};
-}
-
 static inline uint8_t decode_operation(uint16_t instruction) {
     return (instruction & MASK_OPERATION) >> OFFSET_BITS_OPERATION;
 }
@@ -36,37 +32,51 @@ static inline uint8_t decode_address(uint16_t instruction) {
     return (instruction & MASK_ADDRESS) >> OFFSET_BITS_ADDRESS;
 }
 
-void cpu_execute(uint16_t memory[16], struct Cpu* cpu) {
-    switch (decode_operation(cpu->instruction)) {
-    case LOAD:
-        if (decode_register0(cpu->instruction) == 3) {
-            cpu->signal = 0;
-        }
-        else {
-            cpu->registers[decode_register0(cpu->instruction)] = memory[decode_address(cpu->instruction)];
-        }
-        break;
-    case STORE:
-        memory[decode_address(cpu->instruction)] = cpu->registers[decode_register0(cpu->instruction)];
-        break;
-    case INCREMENT:
-        cpu->registers[0] += 1;
-        break;
-    case ADD:
-        cpu->registers[0] += cpu->registers[1];
-        break;
-    case SUB:
-        cpu->registers[0] -= cpu->registers[1];
-        break;
-    case JUMP:
-        cpu->counter = decode_address(cpu->instruction);
-        break;
-    case JUMP_IF_GREATER:
-        if (cpu->registers[0] - cpu->registers[1] > 0) {
-            cpu->counter = decode_address(cpu->instruction);
-        }
-        break;
+void cpu_load(uint16_t memory[16], struct Cpu* cpu) {
+    if (decode_register0(cpu->instruction) == 3) {
+        cpu->signal = 0;
     }
+    else {
+        cpu->registers[decode_register0(cpu->instruction)] = memory[decode_address(cpu->instruction)];
+    }
+}
+
+void cpu_store(uint16_t memory[16], struct Cpu* cpu) {
+    memory[decode_address(cpu->instruction)] = cpu->registers[decode_register0(cpu->instruction)];
+}
+
+void cpu_increment(uint16_t memory[16], struct Cpu* cpu) {
+    cpu->registers[0] += 1;
+}
+
+void cpu_add(uint16_t memory[16], struct Cpu* cpu) {
+    cpu->registers[0] += cpu->registers[1];
+}
+
+void cpu_sub(uint16_t memory[16], struct Cpu* cpu) {
+    cpu->registers[0] -= cpu->registers[1];
+}
+
+void cpu_jump(uint16_t memory[16], struct Cpu* cpu) {
+    cpu->counter = decode_address(cpu->instruction);
+}
+
+void cpu_jump_if_greater(uint16_t memory[16], struct Cpu* cpu) {
+    if (cpu->registers[0] - cpu->registers[1] > 0) {
+        cpu->counter = decode_address(cpu->instruction);
+    }
+}
+
+struct Cpu cpu_new(void) {
+    return (struct Cpu){0x0000, 0x0, {0x0}, 0, {
+        [LOAD] = cpu_load,
+        [STORE] = cpu_store,
+        [INCREMENT] = cpu_increment,
+        [ADD] = cpu_add,
+        [SUB] = cpu_sub,
+        [JUMP] = cpu_jump,
+        [JUMP_IF_GREATER] = cpu_jump_if_greater
+    }};
 }
 
 void machine_print(uint16_t memory[16], struct Cpu* cpu) {
@@ -81,6 +91,10 @@ void machine_print(uint16_t memory[16], struct Cpu* cpu) {
     printf("\n");
 }
 
+uint16_t encode_instruction(enum Op op, uint8_t reg0, uint8_t reg1, uint8_t address) {
+    return ((uint8_t)op << OFFSET_BITS_OPERATION) | (reg0 << OFFSET_BITS_REGISTER0) | (reg1 << OFFSET_BITS_REGISTER1) | (address << OFFSET_BITS_ADDRESS);
+}
+
 void cpu_run(uint16_t memory[16], uint8_t start, struct Cpu* cpu) {
     // Preparing program entry
     cpu->counter = start;
@@ -89,7 +103,7 @@ void cpu_run(uint16_t memory[16], uint8_t start, struct Cpu* cpu) {
     while (cpu->signal == SIGNAL_RUN) {
         machine_print(memory, cpu);
         cpu->instruction = memory[cpu->counter++];
-        cpu_execute(memory, cpu);
+        cpu->ops[decode_operation(cpu->instruction)](memory, cpu);
         if (cpu->counter >= 16 && cpu->signal != SIGNAL_HALT) {
             cpu->signal = SIGNAL_OUT_OF_MEMORY;
         }
