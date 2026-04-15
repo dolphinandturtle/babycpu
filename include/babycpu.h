@@ -19,5 +19,5 @@ enum Op {
 };
 
 struct Cpu cpu_new(void);
-uint16_t encode_instruction(enum Op op, uint8_t reg0, uint8_t reg1, uint8_t address);
 void cpu_run(uint16_t memory[16], uint8_t start, struct Cpu* cpu);
+uint16_t encode_instruction(enum Op op, uint8_t reg0, uint8_t reg1, uint8_t address);
