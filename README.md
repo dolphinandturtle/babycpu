@@ -15,108 +15,99 @@ buffer that proceeds to apply one or more of the following:
 4. At each CPU cycle the memory and CPU counter is printed onto the screen.
 
 # Instructions
-
-## LOAD
-### LOAD (Address)
+## LOAD (address)
 Load bytes of memory via an address onto a specific register.
-
 |operation|register-0|register-s|    address|
 |---------|----------|----------|-----------|
-|    000 0|        XX|        00|   XXXXXXXX|
+|     0000|        XX|        00|   XXXXXXXX|
 
-### LOAD (Immediate)
+## LOAD (immediate)
 Load fixed bytes onto specific register.
-
 |operation|register-0|register-s|      value|
 |---------|----------|----------|-----------|
-|    000 0|        XX|        01|   XXXXXXXX|
+|     0000|        XX|        01|   XXXXXXXX|
 
-### LOAD (Register)
-Load from first and second register onto any other register.
-
-|operation|register-0|register-s|    address|
-|---------|----------|----------|-----------|
-|    000 1|        XX|  00 or 01|   ????????|
-
-### LOAD (Index Register)
+## LOAD (index register)
 Load from memory via address on third and fourth register onto any other register.
-
 |operation|register-0|register-s|    address|
 |---------|----------|----------|-----------|
-|    000 1|        XX|  10 or 11|   ????????|
+|     0000|        XX|        10|   ????????|
 
-## STORE
-### STORE (address)
+## LOAD (local register)
+Load the first register onto the third register 
+(1->3).
+|operation|register-0|register-s|    address|
+|---------|----------|----------|-----------|
+|     0000|        00|        11|   ????????|
+
+Load the second register onto the first register 
+(2->1).
+|operation|register-0|register-s|    address|
+|---------|----------|----------|-----------|
+|     0000|        01|        11|   ????????|
+
+Load the third register onto the second register 
+(3->2).
+|operation|register-0|register-s|    address|
+|---------|----------|----------|-----------|
+|     0000|        10|        11|   ????????|
+
+Load the fourth register onto the third register 
+(4->3).
+|operation|register-0|register-s|    address|
+|---------|----------|----------|-----------|
+|     0000|        11|        11|   ????????|
+
+## STORE (address)
 Store register bytes onto memory via an address.
-
 |operation|register-0|register-s|    address|
 |---------|----------|----------|-----------|
-|    001 0|        XX|        00|   XXXXXXXX|
+|     0001|        XX|        00|   XXXXXXXX|
 
-### STORE (immeddiate)
+## STORE (immediate)
 Store fixed bytes onto memory via an address.
-
 |operation|register-0|register-s|      value|
 |---------|----------|----------|-----------|
-|    001 0|        XX|        01|   XXXXXXXX|
+|     0001|        XX|        01|   XXXXXXXX|
 
-### STORE (register)
-Store any register bytes onto first and second register.
-
+## STORE (index register)
+Store onto memory via address on third and fourth 
+register.
 |operation|register-0|register-s|    address|
 |---------|----------|----------|-----------|
-|    001 1|        XX|  00 or 01|   ????????|
+|     0001|        XX|  10 or 11|   ????????|
 
-### STORE (index register)
-Store onto memory via address on third and fourth register.
-
+## Addition (register)
+Add second register to first register.
 |operation|register-0|register-s|    address|
 |---------|----------|----------|-----------|
-|    001 1|        XX|  10 or 11|   ????????|
+|     0010|        XX|        XX|   ????????|
 
-## Addition
-### Addition (register)
+## Subtraction (register)
+Subtract second register to first register.
 |operation|register-0|register-s|    address|
 |---------|----------|----------|-----------|
-|    010 0|        ??|        ??|   ????????|
+|     0011|        XX|        XX|   ????????|
 
-### Addition (immediate)
+## Multiplication (register)
+Multiply second register to first register.
 |operation|register-0|register-s|    address|
 |---------|----------|----------|-----------|
-|    010 1|        ??|        ??|   XXXXXXXX|
+|     0100|        XX|        XX|   ????????|
 
-## Subtraction
-### Subtraction (register)
+## Jump (immediate)
+Program counter is changed to the given address.
 |operation|register-0|register-s|    address|
 |---------|----------|----------|-----------|
-|    011 0|        ??|        ??|   ????????|
+|     0101|        ??|        ??|   XXXXXXXX|
 
-### Subtraction (immediate)
+## Conditional Jump (positive register)
+Program counter is changed to the given address if 
+the first register is greater than the second 
+register.
 |operation|register-0|register-s|    address|
 |---------|----------|----------|-----------|
-|    011 1|        ??|        ??|   XXXXXXXX|
-
-## Multiplication
-### Multiplication (register)
-|operation|register-0|register-s|    address|
-|---------|----------|----------|-----------|
-|    100 0|        ??|        ??|   ????????|
-
-### Multiplication (immediate)
-|operation|register-0|register-s|    address|
-|---------|----------|----------|-----------|
-|    100 1|        ??|        ??|   XXXXXXXX|
-
-## Jump
-### Jump (immediate)
-|operation|register-0|register-s|    address|
-|---------|----------|----------|-----------|
-|    101 0|        ??|        ??|   XXXXXXXX|
-
-### Jump (index register)
-|operation|register-0|register-s|    address|
-|---------|----------|----------|-----------|
-|    101 1|        XX|        ??|   ????????|
+|     0110|        XX|        XX|   XXXXXXXX|
 
 # Installation (Linux)
 `make`
