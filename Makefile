@@ -6,4 +6,4 @@ all:
 clean:
 	rm -f writeme
 	rm -f build/add
-	rm -f build/sum
+	rm -f build/loop
