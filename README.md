@@ -5,13 +5,13 @@ being iterated over sequentially following a CPU **counter**, each integer is th
 buffer that proceeds to apply one or more of the following:
 1. Read operation (move data from the memory onto the CPU: *LOAD*).
 2. Write operation (move data from the CPU to the memory: *STORE*).
-3. Arithmetic operation (perform arithmetic onto data loaded onto the CPU: *INCREMENT*, *ADD* and *SUB*).
-4. Control flow operation (modify the CPU counter: *JUMP* and *JUMP_IF_GREATER*).
+3. Arithmetic operation (perform arithmetic onto data loaded onto the CPU: *ADD*, *SUB* and *MUL*).
+4. Control flow operation (modify the CPU counter: *JUMP*).
 
 # Features
 1. The CPU processes in 16-bit instructions.
 2. The CPU has four 8-bit registers, arithmetic on the 0-255 range.
-3. The CPU has a 4-bit address counter, has access to 16 memory slots.
+3. The CPU has a 8-bit address counter, has access to 255 memory slots.
 4. At each CPU cycle the memory and CPU counter is printed onto the screen.
 
 # Instructions
@@ -62,13 +62,7 @@ Load the fourth register onto the third register
 Store register bytes onto memory via an address.
 |operation|register-0|register-s|    address|
 |---------|----------|----------|-----------|
-|     0001|        XX|        00|   XXXXXXXX|
-
-## STORE (immediate)
-Store fixed bytes onto memory via an address.
-|operation|register-0|register-s|      value|
-|---------|----------|----------|-----------|
-|     0001|        XX|        01|   XXXXXXXX|
+|     0001|  00 or 01|        ??|   XXXXXXXX|
 
 ## STORE (index register)
 Store onto memory via address on third and fourth 
@@ -95,19 +89,23 @@ Multiply second register to first register.
 |---------|----------|----------|-----------|
 |     0100|        XX|        XX|   ????????|
 
-## Jump (immediate)
-Program counter is changed to the given address.
-|operation|register-0|register-s|    address|
-|---------|----------|----------|-----------|
-|     0101|        ??|        ??|   XXXXXXXX|
-
 ## Conditional Jump (positive register)
 Program counter is changed to the given address if 
 the first register is greater than the second 
 register.
 |operation|register-0|register-s|    address|
 |---------|----------|----------|-----------|
-|     0110|        XX|        XX|   XXXXXXXX|
+|     0101|        XX|        XX|   XXXXXXXX|
+
+## Halt
+Stops instruction execution.
+|operation|register-0|register-s|    address|
+|---------|----------|----------|-----------|
+|     0110|        ??|        ??|   ????????|
+
 
 # Installation (Linux)
 `make`
+
+# Installation (Windows)
+Don't.
